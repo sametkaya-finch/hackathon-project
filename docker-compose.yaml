@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  m1_sender:
+    build: ./m1_sender
+    container_name: m1_sender
+    networks:
+      bkzs_net:
+        ipv4_address: 10.0.0.11
+    environment:
+      - HMAC_KEY=my_secret_key_123
+
+  m2_validator:
+    build: ./m2_validator
+    container_name: m2_validator
+    volumes:
+      - ./data:/app/data
+    networks:
+      bkzs_net:  #ic agdaki bacagi m1'i dinler
+        ipv4_address: 10.0.0.12
+      hacker_net: #dis agdaki bacagi m3'u dinler
+        ipv4_address: 10.0.1.12
+
+  m3_hacker:
+    build: ./m3_hacker
+    container_name: m3_hacker
+    cap_add:
+      - NET_ADMIN
+    networks:
+      hacker_net: #hacker dis agda
+        ipv4_address: 10.0.1.13
+
+  m4_dashboard:
+    build: ./m4_dashboard
+    container_name: m4_dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+    networks:
+      bkzs_net:   #ic agdaki bacagi m1 ve m2 ile ayni agda
+        ipv4_address: 10.0.0.14
+      hacker_net: #butonlarin calismasi icin dis agda hacker ile ayni agda
+        ipv4_address: 10.0.1.14
+
+networks:
+  bkzs_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+  hacker_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24

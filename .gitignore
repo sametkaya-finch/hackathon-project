@@ -1,0 +1,6 @@
+venv/
+*.tar.gz
+*.zip
+__pycache__/
+*.db-shm
+*.db-wal
